@@ -2,6 +2,8 @@
  * Created by ArtemRomanov on 24.05.2017.
  */
 
+$('#load').on('click', checkOffline());
+
 function getUrl(method, params) {
     if (!method) throw new Error('Не указан метод');
     params = params || {};
@@ -9,14 +11,19 @@ function getUrl(method, params) {
     return 'https://api.vk.com/method/' + method + '?' + $.param(params);
 }
 
-function sendRequest(method, params) {
+function sendRequest(method, params, func) {
     $.ajax({
-        url: getUrl('friends.search', {count: 60, fields: 'photo_100'}),
+        url: getUrl(method, params),
         method: 'GET',
         dataType: 'JSONP',
-        success: function (data) {
-            console.log(data);
-        }
+        success: func
+    });
+}
+
+function checkOffline() {
+    sendRequest('users.get', {user_ids: '119397727', fields: 'online'}, function (data) {
+        console.log(data);
+        console.log(data.response[0].online);
     });
 }
 
