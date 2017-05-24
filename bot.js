@@ -2,7 +2,7 @@
  * Created by ArtemRomanov on 24.05.2017.
  */
 
-$('#load').on('click', checkOffline());
+$('#load').on('click', chechMessage());
 
 function getUrl(method, params) {
     if (!method) throw new Error('Не указан метод');
@@ -27,3 +27,15 @@ function checkOffline() {
     });
 }
 
+function chechMessage() {
+        sendRequest('messages.get', {count: '5', filters: '0'}, function (data) {
+            for (var i = 1; i < data.response.length; i++) {
+                if (data.response[i].read_state == 0)
+                {
+                    var id_mes = data.response[i].mid;
+                    var text = data.response[i].body;
+                }
+            }
+
+        });
+}
