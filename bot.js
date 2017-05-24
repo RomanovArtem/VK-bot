@@ -2,7 +2,7 @@
  * Created by ArtemRomanov on 24.05.2017.
  */
 
-$('#load').on('click', chechMessage());
+//$('#load').on('click', checkMessage());
 
 function getUrl(method, params) {
     if (!method) throw new Error('Не указан метод');
@@ -26,16 +26,24 @@ function checkOffline() {
         console.log(data.response[0].online);
     });
 }
+var aa = 0;
+function checkMessage() {
+        sendRequest('messages.get', {count: '20', filters: '0'}, function (data) {
+            var html = '';
 
-function chechMessage() {
-        sendRequest('messages.get', {count: '5', filters: '0'}, function (data) {
             for (var i = 1; i < data.response.length; i++) {
-                if (data.response[i].read_state == 0)
-                {
+                if (data.response[i].read_state == 0) {
                     var id_mes = data.response[i].mid;
-                    var text = data.response[i].body;
+                    var text_mes = data.response[i].body;
+                    html += '<li>' + id_mes + ' ' + text_mes + '</li>';
                 }
             }
-
+            $('ul').html(html);
         });
+        //return id_mes;
+    aa += 10;
+    $('p').html(aa)
 }
+
+setInterval(checkMessage, 10 * 1000);
+
