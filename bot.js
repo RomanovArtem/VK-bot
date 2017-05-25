@@ -2,7 +2,14 @@
  * Created by ArtemRomanov on 24.05.2017.
  */
 
-$('#load').on('click', checkMessage());
+$('#stop').click(function() {
+    clearInterval(timerId);
+});
+
+$('#reload').click(function() {
+   location.reload();
+});
+
 var time = 0;
 
 var online = 0;
@@ -53,7 +60,7 @@ function checkMessage() {
         time += 10;
         $('p').html('Time(sec): ' + time);
 }
-setInterval(checkMessage, 10 * 1000);
+var timerId = setInterval(checkMessage, 2 * 1000);
 
 function identifyUsername(id_user, id_message) {
     sendRequest('users.get', {user_ids: id_user}, function (data) {
