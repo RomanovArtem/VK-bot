@@ -2,7 +2,7 @@
  * Created by ArtemRomanov on 24.05.2017.
  */
 
-//$('#load').on('click', checkMessage());
+$('#load').on('click', checkMessage());
 var time = 0;
 
 var online = 0;
@@ -27,24 +27,23 @@ function checkOnline() {
         online = data.response[0].online;
     });
 }
-
+var user_name = '';
 function checkMessage() {
         sendRequest('messages.get', {count: '1', filters: '0'}, function (data) {
             var html = '';
-            var user_name = '';
 
             checkOnline();
             if (online == 1) {
-                for (var i = data.response.length - 1; i > 0; i--) {
+                for (var i = 1; i < data.response.length; i++) {
                     if (data.response[i].read_state == 0) {
+                        console.log(data);
+
                         var id_mes = data.response[i].mid;
                         var id_user = data.response[i].uid;
                         var text_mes = data.response[i].body;
                         html += '<li>' + id_mes + ' ' + id_user + ' ' + text_mes + '</li>';
 
-                        identifyUsername(id_user);
-                        sendMessage(id_user);
-                        readMessage(id_mes);
+                        identifyUsername(id_user, id_mes);
                     }
                 }
                 $('ul').html(html);
@@ -56,21 +55,23 @@ function checkMessage() {
 }
 setInterval(checkMessage, 10 * 1000);
 
-function readMessage(id_mes) {
-    sendRequest('messages.markAsRead', {message_ids: id_mes}, function () {
-        console.log('Сообщение прочитано ' + user_name);
+function identifyUsername(id_user, id_message) {
+    sendRequest('users.get', {user_ids: id_user}, function (data) {
+        user_name = data.response[0].first_name;
+        readMessage(id_message);
+        sendMessage(id_user);
+    });
+}
+
+function readMessage(id_message) {
+    sendRequest('messages.markAsRead', {message_ids: id_message}, function () {
+        console.log('Сообщение прочитано ');
     });
 }
 
 function sendMessage(id_user) {
-    var message = 'Привет ' + user_name + ' я сейчас офлайн!';
+    var message = 'Привет ' + user_name + ' я сейчас онлайн!';
     sendRequest('messages.send', {user_id: id_user, message: message}, function () {
         console.log('Сообщение отправлено ' + user_name);
-    });
-}
-
-function identifyUsername(id) {
-    sendRequest('users.get', {user_ids: id}, function (data) {
-        user_name = data.response[0].first_name;
     });
 }
