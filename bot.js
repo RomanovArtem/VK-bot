@@ -4,7 +4,7 @@
 
 //$('#load').on('click', checkMessage());
 var time = 0;
-var user_name = '';
+
 var online = 0;
 function getUrl(method, params) {
     if (!method) throw new Error('Не указан метод');
@@ -31,9 +31,10 @@ function checkOnline() {
 function checkMessage() {
         sendRequest('messages.get', {count: '1', filters: '0'}, function (data) {
             var html = '';
+            var user_name = '';
 
             checkOnline();
-            if (online == 0) {
+            if (online == 1) {
                 for (var i = data.response.length - 1; i > 0; i--) {
                     if (data.response[i].read_state == 0) {
                         var id_mes = data.response[i].mid;
@@ -42,7 +43,7 @@ function checkMessage() {
                         html += '<li>' + id_mes + ' ' + id_user + ' ' + text_mes + '</li>';
 
                         identifyUsername(id_user);
-                      //  sendMessage(id_user);
+                        sendMessage(id_user);
                         readMessage(id_mes);
                     }
                 }
