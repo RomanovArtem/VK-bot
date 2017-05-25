@@ -3,7 +3,9 @@
  */
 
 //$('#load').on('click', checkMessage());
-
+var time = 0;
+var user_name = '';
+var online = 0;
 function getUrl(method, params) {
     if (!method) throw new Error('Не указан метод');
     params = params || {};
@@ -20,30 +22,54 @@ function sendRequest(method, params, func) {
     });
 }
 
-function checkOffline() {
+function checkOnline() {
     sendRequest('users.get', {user_ids: '119397727', fields: 'online'}, function (data) {
-        console.log(data);
-        console.log(data.response[0].online);
+        online = data.response[0].online;
     });
 }
-var aa = 0;
+
 function checkMessage() {
-        sendRequest('messages.get', {count: '20', filters: '0'}, function (data) {
+        sendRequest('messages.get', {count: '1', filters: '0'}, function (data) {
             var html = '';
 
-            for (var i = 1; i < data.response.length; i++) {
-                if (data.response[i].read_state == 0) {
-                    var id_mes = data.response[i].mid;
-                    var text_mes = data.response[i].body;
-                    html += '<li>' + id_mes + ' ' + text_mes + '</li>';
-                }
-            }
-            $('ul').html(html);
-        });
-        //return id_mes;
-    aa += 10;
-    $('p').html(aa)
-}
+            checkOnline();
+            if (online == 0) {
+                for (var i = data.response.length - 1; i > 0; i--) {
+                    if (data.response[i].read_state == 0) {
+                        var id_mes = data.response[i].mid;
+                        var id_user = data.response[i].uid;
+                        var text_mes = data.response[i].body;
+                        html += '<li>' + id_mes + ' ' + id_user + ' ' + text_mes + '</li>';
 
+                        identifyUsername(id_user);
+                      //  sendMessage(id_user);
+                        readMessage(id_mes);
+                    }
+                }
+                $('ul').html(html);
+            }
+        });
+
+        time += 10;
+        $('p').html('Time(sec): ' + time);
+}
 setInterval(checkMessage, 10 * 1000);
 
+function readMessage(id_mes) {
+    sendRequest('messages.markAsRead', {message_ids: id_mes}, function () {
+        console.log('Сообщение прочитано ' + user_name);
+    });
+}
+
+function sendMessage(id_user) {
+    var message = 'Привет ' + user_name + ' я сейчас офлайн!';
+    sendRequest('messages.send', {user_id: id_user, message: message}, function () {
+        console.log('Сообщение отправлено ' + user_name);
+    });
+}
+
+function identifyUsername(id) {
+    sendRequest('users.get', {user_ids: id}, function (data) {
+        user_name = data.response[0].first_name;
+    });
+}
