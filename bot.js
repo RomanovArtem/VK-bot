@@ -36,9 +36,8 @@ function checkOnline() {
 }
 var user_name = '';
 function checkMessage() {
-        sendRequest('messages.get', {count: '1', filters: '0'}, function (data) {
+        sendRequest('messages.get', {count: '10', filters: '0'}, function (data) {
             var html = '';
-
             checkOnline();
             if (online == 1) {
                 for (var i = 1; i < data.response.length; i++) {
@@ -60,7 +59,7 @@ function checkMessage() {
         time += 10;
         $('p').html('Time(sec): ' + time);
 }
-var timerId = setInterval(checkMessage, 2 * 1000);
+var timerId = setInterval(checkMessage, 10 * 1000);
 
 function identifyUsername(id_user, id_message) {
     sendRequest('users.get', {user_ids: id_user}, function (data) {
