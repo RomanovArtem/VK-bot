@@ -39,9 +39,9 @@ function checkMessage() {
         sendRequest('messages.get', {count: '10', filters: '0'}, function (data) {
             var html = '';
             checkOnline();
-            if (online == 1) {
+            if (online == 0) {
                 for (var i = 1; i < data.response.length; i++) {
-                    if (data.response[i].read_state == 0) {
+                    if (data.response[i].read_state == 0 && data.response[i].chat_id == undefined) {
                         console.log(data);
 
                         var id_mes = data.response[i].mid;
@@ -59,7 +59,7 @@ function checkMessage() {
         time += 10;
         $('p').html('Time(sec): ' + time);
 }
-var timerId = setInterval(checkMessage, 10 * 1000);
+var timerId = setInterval(checkMessage, 30 * 1000);
 
 function identifyUsername(id_user, id_message) {
     sendRequest('users.get', {user_ids: id_user}, function (data) {
@@ -76,7 +76,7 @@ function readMessage(id_message) {
 }
 
 function sendMessage(id_user) {
-    var message = 'Привет ' + user_name + ' я сейчас онлайн!';
+    var message = 'Здравствуйте ' + user_name + ' я сейчас офлайн. Напишите позже!';
     sendRequest('messages.send', {user_id: id_user, message: message}, function () {
         console.log('Сообщение отправлено ' + user_name);
     });
